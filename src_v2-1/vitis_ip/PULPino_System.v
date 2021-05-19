@@ -4,7 +4,7 @@
 `default_nettype none
 `timescale 1 ns / 1 ps
 // Top level of the kernel. Do not modify module name, parameters or ports.
-module PULPino_System_L1 #(
+module PULPino_System #(
   parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12,
   parameter integer C_S_AXI_CONTROL_DATA_WIDTH = 32,
   parameter integer C_SPI_AXI_ADDR_WIDTH       = 64,
@@ -14,8 +14,6 @@ module PULPino_System_L1 #(
   // System Signals
   input  wire                                    ap_clk               ,
   input  wire                                    ap_rst_n             ,
-  input  wire                                    ap_clk_2             ,
-  input  wire                                    ap_rst_n_2           ,
   //  Note: A minimum subset of AXI4 memory mapped signals are declared.  AXI
   // signals omitted from these interfaces are automatically inferred with the
   // optimal values for Xilinx accleration platforms.  This allows Xilinx AXI4 Interconnects
@@ -162,8 +160,6 @@ PULPino_System_L2 #(
 inst_L2 (
   .ap_clk          ( ap_clk          ),
   .ap_rst_n        ( ap_rst_n        ),
-  .ap_clk_2        ( ap_clk_2        ),
-  .ap_rst_n_2      ( ap_rst_n_2      ),
   .spi_axi_awvalid ( spi_axi_awvalid ),
   .spi_axi_awready ( spi_axi_awready ),
   .spi_axi_awaddr  ( spi_axi_awaddr  ),

@@ -78,7 +78,7 @@ cl_uint Load_file(cl_uint* spi_data, cl_uint* instr_num){
 	ifstream ifs;
 	char buffer[20];
 
-	ifs.open("../../spi_stim.txt");
+	ifs.open("../../spi_hello.txt");
 	if(!ifs.is_open()) {
 		cout<<"Failed to open file.\n";
 		return -1;

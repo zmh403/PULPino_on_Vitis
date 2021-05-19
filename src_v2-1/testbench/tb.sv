@@ -9,8 +9,7 @@ import control_PULPino_System_vip_pkg::*;
 
 module PULPino_System_tb ();
 parameter integer LP_MAX_LENGTH = 8192;
-//parameter integer LP_MAX_TRANSFER_LENGTH = 16384 / 4;
-parameter integer LP_MAX_TRANSFER_LENGTH = 1024;
+parameter integer LP_MAX_TRANSFER_LENGTH = 16384 / 4;
 parameter integer C_S_AXI_CONTROL_ADDR_WIDTH = 12;
 parameter integer C_S_AXI_CONTROL_DATA_WIDTH = 32;
 parameter integer C_SPI_AXI_ADDR_WIDTH = 64;
@@ -52,14 +51,6 @@ end
 //parameter integer LP_CLK2_PERIOD_PS = 5 ns; // 200 MHz
 parameter integer LP_CLK2_PERIOD_PS = 10000; // 100 MHz
 
-logic ap_clk_2 = 0;
-
-initial begin: AP_CLK_2
-  forever begin
-    ap_clk_2 = #(LP_CLK2_PERIOD_PS/2) ~ap_clk_2;
-  end
-end
- 
 //System Signals
 logic ap_rst_n = 0;
 logic initial_reset  =0;
@@ -79,20 +70,6 @@ endtask
 initial begin: AP_RST
   ap_rst_n_sequence(50);
   initial_reset =1;
-end
- logic ap_rst_n_2 = 0;
-
-task automatic ap_rst_n_2_sequence(input integer unsigned width = 20);
-  @(posedge ap_clk_2);
-  #1ps;
-  ap_rst_n_2 = 0;
-  repeat (width) @(posedge ap_clk_2);
-  #1ps;
-  ap_rst_n_2 = 1;
-endtask
-
-initial begin: AP_RST_2
-  ap_rst_n_2_sequence(50);
 end
 
 integer instr_num;
@@ -148,9 +125,7 @@ PULPino_System_L1 #(
 )
 inst_dut (
   .ap_clk                ( ap_clk                ),
-  .ap_clk_2              ( ap_clk_2              ),
   .ap_rst_n              ( ap_rst_n              ),
-  .ap_rst_n_2            ( ap_rst_n_2            ),
   .spi_axi_awvalid       ( spi_axi_awvalid       ),
   .spi_axi_awready       ( spi_axi_awready       ),
   .spi_axi_awaddr        ( spi_axi_awaddr        ),
@@ -269,7 +244,6 @@ task automatic system_reset_sequence(input integer unsigned width = 20);
   $display("%t : Starting System Reset Sequence", $time);
   fork
     ap_rst_n_sequence(25);
-    ap_rst_n_2_sequence(25);
   join
 
 endtask
@@ -620,6 +594,8 @@ function automatic bit check_uart_result();
   for (longint unsigned slot = 0; slot < LP_MAX_TRANSFER_LENGTH/32; slot++) begin
     ret_rd_value = spi_axi.mem_model.backdoor_memory_read_4byte(spi_data_ptr + (slot * 4));
     $display($time," RECV_VALUE = %b %s", ret_rd_value[7:0], ret_rd_value[7:0]);
+  	if(ret_rd_value[7:0]==32'h0A)
+    	break;
   end
 
   return(error_found);

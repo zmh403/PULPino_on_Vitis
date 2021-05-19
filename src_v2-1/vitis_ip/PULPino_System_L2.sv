@@ -10,8 +10,6 @@ module PULPino_System_L2 #(
   // System Signals
   input  wire                              ap_clk         ,
   input  wire                              ap_rst_n       ,
-  input  wire                              ap_clk_2       ,
-  input  wire                              ap_rst_n_2     ,
   // AXI4 master interface spi_axi
   output wire                              spi_axi_awvalid,
   input  wire                              spi_axi_awready,
@@ -128,13 +126,6 @@ assign ap_done = &ap_done_r;
 // Ready Logic (non-pipelined case)
 assign ap_ready = ap_done;
 
-
-// Register and invert kernel reset signal.
-always @(posedge ap_clk_2) begin
-  kernel_rst <= ~ap_rst_n_2;
-end
-
-
 // Vadd example
 PULPino_System_L3 #(
   .C_M_AXI_ADDR_WIDTH ( C_SPI_AXI_ADDR_WIDTH ),
@@ -145,8 +136,8 @@ PULPino_System_L3 #(
 inst_L3 (
   .aclk                    ( ap_clk                  ),
   .areset                  ( areset                  ),
-  .kernel_clk              ( ap_clk_2                ),
-  .kernel_rst              ( kernel_rst              ),
+  .kernel_clk              ( ap_clk                  ),
+  .kernel_rst              ( areset                  ),
   .ctrl_addr_offset        ( spi_data                ),
   .ctrl_xfer_size_in_bytes ( ctrl_xfer_size_in_bytes ),
 //  .ctrl_constant           ( ctrl_constant           ),
